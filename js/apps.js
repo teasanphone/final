@@ -267,3 +267,62 @@ function photoViewer(index) {
  photo.addEventListener('touchstart',e=>{startX=e.changedTouches[0].clientX;},{passive:true});
  photo.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-startX;if(Math.abs(dx)>45)photoViewer(current+(dx<0?1:-1));},{passive:true});
 }
+
+shell = function (name, dark = false) {
+  activeApp = name;
+  lastApp = name;
+
+  const home = document.getElementById('home');
+  const lock = document.getElementById('lock');
+  const pin = document.getElementById('pin');
+
+  home.hidden = true;
+  lock.hidden = true;
+  pin.hidden = true;
+
+  panel.hidden = false;
+  panel.style.removeProperty('display');
+  panel.className = 'screen apppanel designed' + (dark ? ' dark' : '');
+
+  panel.innerHTML = `
+    <div class="app-navigation">
+      <button type="button" aria-label="뒤로가기" onclick="appBack()">
+        ${ico('back')}
+        <span>뒤로</span>
+      </button>
+    </div>
+    <div id="appViewport">
+      <div id="appBody"></div>
+    </div>
+  `;
+
+  setAppStatus(true, dark);
+
+  return document.getElementById('appBody');
+};
+
+openApp = function (name) {
+  clearInterval(callTimer);
+  NAVSTACK = [];
+  lastApp = '';
+
+  const routes = {
+    '카카오톡': () => kakaoChats(),
+    '인스타그램': () => igHome(),
+    '인스타': () => igHome(),
+    'ChatGPT': () => chat(0),
+    '메모': () => notes(),
+    '캘린더': () => calendar(),
+    '사진': () => photoLibrary(),
+    '전화': () => calls(),
+    '인터넷': () => safari(),
+    'Safari': () => safari(),
+    '사파리': () => safari(),
+    '문자': () => messages(),
+    '음악': () => musicScreen()
+  };
+
+  if (routes[name]) {
+    routes[name]();
+  }
+};
